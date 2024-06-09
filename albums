@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <access_token> <artist_id>"
+    exit 1
+fi
+
+spotify_request() {
+  local access_token=$1
+  local url=$2
+
+  curl \
+    --silent \
+    --fail \
+    --request GET \
+    --url "$url" \
+    --header "Authorization: Bearer $access_token"
+}
+
+access_token=$1
+artist_id=$2
+api_url="https://api.spotify.com/v1/artists/$artist_id/albums?limit=50&$offset=0&market=DE"
+call_results=()
+while [ -n "$api_url" ]
+do
+  response=$(spotify_request "$access_token" "$api_url")
+  albums=$(echo "$response" | jq -r '[.items[] | {id, name, url_to_open: .external_urls.spotify, images: .images }]')
+  call_results+=( "$albums" )
+  
+  if [ "$(echo "$response" | jq -e '.next? // empty')" != "null" ]; then
+    api_url=$(echo "$response" | jq -r '.next')
+  else
+    api_url=""
+  fi
+  if [ "$api_url" == "null" ]; then api_url=""; fi
+done
+
+echo -n "${call_results[*]}" | jq -r -s 'add'

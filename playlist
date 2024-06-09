@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+#
+# Retrieves the (distinct) albums of every track in a playlist.
+# This script is meant for usage on playlists that contain only a single artist!
+#
+
+set -e
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <access_token> <playlist_id>"
+    exit 1
+fi
+
+spotify_request() {
+  local access_token=$1
+  local url=$2
+
+  curl \
+    --silent \
+    --fail \
+    --request GET \
+    --url "$url" \
+    --header "Authorization: Bearer $access_token"
+}
+
+access_token=$1
+playlist_id=$2
+playlist_items_url="https://api.spotify.com/v1/playlists/$playlist_id/tracks?limit=100&$offset=0&market=DE&fields=next%2Citems%28track%28artists%28name%2Cid%29%2Calbum%28external_urls%2Cid%2Cimages%2Cname%29%29"
+playlist_details_url="https://api.spotify.com/v1/playlists/$playlist_id?market=DE&fields=images%2Cname"
+call_results=()
+artist_id=
+artist_name=
+
+#
+# Get the playlist image
+#
+response=$(spotify_request "$access_token" "$playlist_details_url")
+playlist_images=$(jq -r ".images" <<< "$response")
+playlist_name=$(jq -r ".name" <<< "$response")
+
+#
+# Get the playlist items
+#
+while [ -n "$playlist_items_url" ]
+do
+  response=$(spotify_request "$access_token" "$playlist_items_url")
+  albums=$(echo "$response" | jq -r '[.items[].track | {id: .album.id, name: .album.name, url_to_open: .album.external_urls.spotify, images: .album.images}]' | jq -r 'unique')
+  if [ -z "$artist_id" ]; then
+    artist_id=$(jq -r ".items[0].track.artists[0].id" <<< "$response")
+  fi
+  if [ -z "$artist_name" ]; then
+    artist_name=$(jq -r ".items[0].track.artists[0].name" <<< "$response")
+  fi
+
+  call_results+=( "$albums" )
+  
+  if [ "$(echo "$response" | jq -e '.next? // empty')" != "null" ]; then
+    playlist_items_url=$(echo "$response" | jq -r '.next')
+  else
+    playlist_items_url=""
+  fi
+  if [ "$playlist_items_url" == "null" ]; then playlist_items_url=""; fi
+done
+
+albums=$(echo -n "${call_results[*]}" | jq -r -s 'add')
+combined_json=$(jq -n \
+  --arg playlist_images "$playlist_images" \
+  --arg artist_id "$artist_id" \
+  --arg artist_name "$artist_name" \
+  --arg playlist_name "$playlist_name" \
+  --argjson albums "$albums" \
+  '{artistId: $artist_id, artistName: $artist_name, playlistImages: $playlist_images, albums: $albums, playlistName: $playlist_name}')
+echo "$combined_json"

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+set -e
+
+SPOTIFY_CLIENT_ID=$1
+SPOTIFY_CLIENT_SECRET=$2
+SOURCE_FILE=$3
+
+if [ $# -le 3 ] && [ $# -ge 4 ]; then
+    echo "Usage: $0 <client_id> <client_secret> <input_file> [output_dir]"
+    exit 1
+fi
+
+# Set the output folder if it is not supplied
+if [ -z "$4" ]; then
+    OUTPUT_DIR="output"
+else
+    OUTPUT_DIR=$4
+fi
+
+if [ ! -f "$SOURCE_FILE" ]; then
+  echo "The file '$SOURCE_FILE' needs to exist. It should contain a JSON array of objects that are valid entry defintions. Please see the readme file for details" >&2
+  exit 1
+fi
+
+ACCESS_TOKEN=$(source ./login "$SPOTIFY_CLIENT_ID" "$SPOTIFY_CLIENT_SECRET")
+echo "Login successful"
+
+rm -rf "$OUTPUT_DIR"
+mkdir "$OUTPUT_DIR"
+
+jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
+    ITEM_ID=$(jq -r '.id' <<< "$entry")
+    TYPE=$(jq -r '.type' <<< "$entry")
+    
+    mkdir "$OUTPUT_DIR/$ITEM_ID"
+
+    if [ "$TYPE" = "playlist" ]; then
+      PLAYLIST=$(source ./playlist "$ACCESS_TOKEN" "$ITEM_ID")
+      ARTIST_NAME=$(jq -r '.artistName' <<< "$PLAYLIST")
+      PLAYLIST_NAME=$(jq -r '.playlistName' <<< "$PLAYLIST")
+      echo "Playlist is: $PLAYLIST_NAME"
+      echo "Main artist is: $ARTIST_NAME"
+      PLAYLIST_IMAGES=$(jq -r '.playlistImages' <<< "$PLAYLIST")
+      ALBUMS=$(jq -r '.albums' <<< "$PLAYLIST")
+      ADDITIONAL_ARTIST_DETAILS=$(jq -n --arg artist_name "$ARTIST_NAME" --argjson playlist_images "$PLAYLIST_IMAGES" '{name: $artist_name, images: $playlist_images}')
+      ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
+
+      cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
+      cat <<< "${ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
+    elif [ "$TYPE" = "artist" ]; then
+      ADDITIONAL_ARTIST_DETAILS=$(source ./artist "$ACCESS_TOKEN" "$ITEM_ID")
+      ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
+      ARTIST_NAME=$(echo "$ARTIST_DETAILS" | jq -r .name)
+      echo "Artist is: $ARTIST_NAME"
+      ALBUMS=$(source ./albums "$ACCESS_TOKEN" "$ITEM_ID")
+
+      cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
+      cat <<< "${ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
+    else
+      echo "Unknown type: $TYPE, skipping entry"
+    fi
+
+    echo "Getting details for id $ITEM_ID"
+
+
+
+done

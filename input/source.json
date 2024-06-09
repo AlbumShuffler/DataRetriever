@@ -1,0 +1,82 @@
+[ { "shortName": "DDF"
+  , "httpFriendlyShortName": "ddf"
+  , "type": "artist"
+  , "id": "3meJIgRw7YleJrmbpbJK6S"
+  , "icon": "img/ddf_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "altCoverCenterX": 60
+  , "altCoverCenterY": 50
+  , "coverColorA": "#DF030E"
+  , "coverColorB": "#04A5E3" }
+, { "shortName": "DDF Kids"
+  , "httpFriendlyShortName": "ddfk"
+  , "type": "artist"
+  , "id": "0vLsqW05dyLvjuKKftAEGA"
+  , "icon": "img/ddfk_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#DF030E"
+  , "coverColorB": "#04A5E3" }
+, { "shortName": "TKKG"
+  , "httpFriendlyShortName": "tkkg"
+  , "type": "artist"
+  , "id": "61qDotnjM0jnY5lkfOP7ve" 
+  , "icon": "img/tkkg_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#0B2D74"
+  , "coverColorB": "#0F40A6" }
+, { "shortName": "TKKG(R)"
+  , "httpFriendlyShortName": "tkkgr"
+  , "type": "artist"
+  , "id": "0i38tQX5j4gZ0KS3eCMoIl" 
+  , "icon": "img/tkkg_retro_transparent.png"
+  , "coverCenterX": 55
+  , "coverCenterY": 50
+  , "coverColorA": "#FFE85A"
+  , "coverColorB": "#284193" }
+, { "shortName": "PW"
+  , "httpFriendlyShortName": "pw"
+  , "type": "artist"
+  , "id": "39cu39Rn69BTbnblNDijGN"
+  , "icon": "img/pw_transparent.png"
+  , "coverCenterX": 88
+  , "coverCenterY": 50
+  , "coverColorA": "#DF030E"
+  , "coverColorB": "#04A5E3" }
+, { "shortName": "FF"
+  , "httpFriendlyShortName": "ff"
+  , "type": "artist"
+  , "id": "1hD52edfn6aNsK3fb5c2OT" 
+  , "icon": "img/ff_transparent.png"
+  , "coverColorA": "#AAAAAA"
+  , "coverColorB": "#666666" }
+, { "shortName": "ShkOrg"
+  , "httpFriendlyShortName": "shkorg"
+  , "type": "playlist"
+  , "id": "5Vre4xsKCdhhxgrWsvDDuK"
+  , "icon": "img/shk_org_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 75
+  , "coverColorA": "#4a5344"
+  , "coverColorB": "#806a1c" }
+, { "shortName": "ShkNeu" 
+  , "httpFriendlyShortName": "shkneu"
+  , "type": "playlist"
+  , "id": "3a4JiLdgwQdivwJaj6nOHp"
+  , "icon": "img/shk_neu_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 65
+  , "coverColorA": "#6e672c"
+  , "coverColorB": "#3c4e5c"}
+, { "shortName": "Europa"
+  , "httpFriendlyShortName": "europa"
+  , "type": "playlist"
+  , "id": "5k5zg5FNvBbKuaqmRJt0Eb"
+  , "icon": "img/europa_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#202e39"
+  , "coverColorB": "#3c4e5c" }
+]
