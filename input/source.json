@@ -18,6 +18,15 @@
   , "coverCenterY": 50
   , "coverColorA": "#DF030E"
   , "coverColorB": "#04A5E3" }
+, { "shortName": "D3"
+  , "httpFriendlyShortName": "d3",
+  , "type": "playlist",
+  , "id": "1KGQ5y48ZB9dWiWRM66P15",
+  , "icon": "d3_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#AAAAAA"
+  , "coverColorB": "#666666" }
 , { "shortName": "TKKG"
   , "httpFriendlyShortName": "tkkg"
   , "type": "artist"
