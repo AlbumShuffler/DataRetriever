@@ -95,7 +95,7 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
       SHOW_IMAGES=$(jq -r '.showImages' <<< "$SHOW")
       ALBUMS=$(jq -r '.episodes' <<< "$SHOW")
       FILTERED_ALBUMS=$(filter_by_id "$ALBUMS" "$IGNORE_IDS")
-      ADDITIONAL_ARTIST_DETAILS=$(jq -n --arg artist_name "$ARTIST_NAME" --argjson show_images "$SHOW_IMAGES" '{name: $artist_name, images: $show_images}')
+      ADDITIONAL_ARTIST_DETAILS=$(jq -n --arg artist_name "$SHOW_NAME" --argjson show_images "$SHOW_IMAGES" '{name: $artist_name, images: $show_images}')
       ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
 
       cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
