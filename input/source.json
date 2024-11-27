@@ -7,6 +7,8 @@
   , "coverCenterY": 50
   , "altCoverCenterX": 60
   , "altCoverCenterY": 50
+  , "ignoreIds": ["0sCs2S5YTEN0UT1fwWpvKw", "59WTBKsGdomSgMztadw3uL", "5JHijjtr65MjdNOnNvD3Ec", "67Ipucoa0blx27O3sV7yAi" ]
+  , "ignoreShowWithStrings": [ "liest ...", "liest...", "Outro", "Original-Hörspiel" ]
   , "coverColorA": "#DF030E"
   , "coverColorB": "#04A5E3" }
 , { "shortName": "DDF Kids"
@@ -19,9 +21,9 @@
   , "coverColorA": "#DF030E"
   , "coverColorB": "#04A5E3" }
 , { "shortName": "D3"
-  , "httpFriendlyShortName": "d3",
-  , "type": "playlist",
-  , "id": "1KGQ5y48ZB9dWiWRM66P15",
+  , "httpFriendlyShortName": "d3"
+  , "type": "show"
+  , "id": "5cgMSSNAioVK0STCTlvo0z"
   , "icon": "d3_transparent.png"
   , "coverCenterX": 50
   , "coverCenterY": 50

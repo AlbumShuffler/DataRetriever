@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <access_token> <show_id>"
+    exit 1
+fi
+
+spotify_request() {
+  local access_token=$1
+  local url=$2
+
+  curl \
+    --silent \
+    --fail \
+    --request GET \
+    --url "$url" \
+    --header "Authorization: Bearer $access_token"
+}
+
+access_token=$1
+show_id=$2
+show_details=$(spotify_request "$access_token" "https://api.spotify.com/v1/shows/$show_id?market=DE&fields=name%2Cpublisher")
+show_name=$(echo $show_details | jq -r .name)
+artist_name=$(echo $show_details | jq -r .publisher)
+api_url="https://api.spotify.com/v1/shows/$show_id/episodes?market=DE&limit=50&offset=0"
+call_results=()
+while [ -n "$api_url" ]
+do
+  response=$(spotify_request "$access_token" "$api_url")
+  episodes=$(echo "$response" | jq -r '[.items[] | {id, name, url_to_open: .external_urls.spotify, images: .images }]')
+  call_results+=( "$episodes" )
+  
+  if [ "$(echo "$response" | jq -e '.next? // empty')" != "null" ]; then
+    api_url=$(echo "$response" | jq -r '.next')
+  else
+    api_url=""
+  fi
+  if [ "$api_url" == "null" ]; then api_url=""; fi
+done
+
+result=$(jq -n --arg show_name "$show_name" --arg artist_name "$artist_name" --argjson episodes "$call_results" '{
+  artistName: $artist_name,
+  showName: $show_name,
+  episodes: $episodes,
+  showImages: []
+}')
+
+echo "$result"

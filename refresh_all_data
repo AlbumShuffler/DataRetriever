@@ -23,6 +23,22 @@ if [ ! -f "$SOURCE_FILE" ]; then
   exit 1
 fi
 
+filter_by_id() {
+  local albums="$1"
+  local ids="$2"
+  echo "$albums" | jq --argjson excludes "$ids" 'map(select(.id | IN($excludes[] | tostring) | not))'
+}
+
+filter_by_name() {
+  local inputs="$1"   
+  local excludes="$2" 
+
+  jq --argjson excludes "$excludes" '
+    map(select(.name as $name | $excludes | any(. as $exclude | $name | contains($exclude)) | not))
+  ' <<< "$inputs"
+}
+
+
 ACCESS_TOKEN=$(source ./login "$SPOTIFY_CLIENT_ID" "$SPOTIFY_CLIENT_SECRET")
 echo "Login successful"
 
@@ -32,7 +48,15 @@ mkdir "$OUTPUT_DIR"
 jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
     ITEM_ID=$(jq -r '.id' <<< "$entry")
     TYPE=$(jq -r '.type' <<< "$entry")
-    
+    IGNORE_IDS=$(jq -r '.ignoreIds' <<< "$entry")
+    if [[ -z "${IGNORE_IDS}" || "${IGNORE_IDS}" == "null" ]]; then
+      IGNORE_IDS="[]"
+    fi
+    IGNORE_STRINGS=$(jq -r '.ignoreShowWithStrings' <<< "$entry")
+    if [[ -z "${IGNORE_STRINGS}" || "${IGNORE_STRINGS}" == "null" ]]; then
+      IGNORE_STRINGS="[]"
+    fi
+
     mkdir "$OUTPUT_DIR/$ITEM_ID"
 
     if [ "$TYPE" = "playlist" ]; then
@@ -43,20 +67,39 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
       echo "Main artist is: $ARTIST_NAME"
       PLAYLIST_IMAGES=$(jq -r '.playlistImages' <<< "$PLAYLIST")
       ALBUMS=$(jq -r '.albums' <<< "$PLAYLIST")
+      FILTERED_ALBUMS=$(filter_by_id "$ALBUMS" "$IGNORE_IDS")
       ADDITIONAL_ARTIST_DETAILS=$(jq -n --arg artist_name "$ARTIST_NAME" --argjson playlist_images "$PLAYLIST_IMAGES" '{name: $artist_name, images: $playlist_images}')
       ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
 
       cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
-      cat <<< "${ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
+      cat <<< "${FILTERED_ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
     elif [ "$TYPE" = "artist" ]; then
       ADDITIONAL_ARTIST_DETAILS=$(source ./artist "$ACCESS_TOKEN" "$ITEM_ID")
       ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
       ARTIST_NAME=$(echo "$ARTIST_DETAILS" | jq -r .name)
       echo "Artist is: $ARTIST_NAME"
       ALBUMS=$(source ./albums "$ACCESS_TOKEN" "$ITEM_ID")
+      echo "Filters are: $IGNORE_IDS"
+      echo "And: $IGNORE_STRINGS"
+      FILTERED_ALBUMS=$(filter_by_id "$ALBUMS" "$IGNORE_IDS")
+      FILTERED_ALBUMS=$(filter_by_name "$ALBUMS" "$IGNORE_STRINGS")
 
       cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
-      cat <<< "${ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
+      cat <<< "${FILTERED_ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
+    elif [ "$TYPE" = "show" ]; then
+      SHOW=$(source ./show "$ACCESS_TOKEN" "$ITEM_ID")
+      ARTIST_NAME=$(jq -r '.artistName' <<< "$SHOW")
+      SHOW_NAME=$(jq -r '.showName' <<< "$SHOW")
+      echo "Show is: $SHOW_NAME"
+      echo "Main artist is: $ARTIST_NAME"
+      SHOW_IMAGES=$(jq -r '.showImages' <<< "$SHOW")
+      ALBUMS=$(jq -r '.episodes' <<< "$SHOW")
+      FILTERED_ALBUMS=$(filter_by_id "$ALBUMS" "$IGNORE_IDS")
+      ADDITIONAL_ARTIST_DETAILS=$(jq -n --arg artist_name "$ARTIST_NAME" --argjson show_images "$SHOW_IMAGES" '{name: $artist_name, images: $show_images}')
+      ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
+
+      cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
+      cat <<< "${FILTERED_ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
     else
       echo "Unknown type: $TYPE, skipping entry"
     fi
