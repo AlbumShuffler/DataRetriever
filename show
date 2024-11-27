@@ -21,9 +21,10 @@ spotify_request() {
 
 access_token=$1
 show_id=$2
-show_details=$(spotify_request "$access_token" "https://api.spotify.com/v1/shows/$show_id?market=DE&fields=name%2Cpublisher")
+show_details=$(spotify_request "$access_token" "https://api.spotify.com/v1/shows/$show_id?market=DE&fields=name%2Cpublisher%2Cimages")
 show_name=$(echo $show_details | jq -r .name)
-artist_name=$(echo $show_details | jq -r .publisher)
+show_images=$(echo $show_details | jq -r ".images")
+artist_name=$(echo $show_details | jq -r ".publisher")
 api_url="https://api.spotify.com/v1/shows/$show_id/episodes?market=DE&limit=50&offset=0"
 call_results=()
 while [ -n "$api_url" ]
@@ -40,11 +41,11 @@ do
   if [ "$api_url" == "null" ]; then api_url=""; fi
 done
 
-result=$(jq -n --arg show_name "$show_name" --arg artist_name "$artist_name" --argjson episodes "$call_results" '{
+result=$(jq -n --arg show_name "$show_name" --arg artist_name "$artist_name" --argjson episodes "$call_results" --argjson images "$show_images" '{
   artistName: $artist_name,
   showName: $show_name,
   episodes: $episodes,
-  showImages: []
+  showImages: $images
 }')
 
 echo "$result"
