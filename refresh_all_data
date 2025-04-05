@@ -60,6 +60,7 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
     mkdir "$OUTPUT_DIR/$ITEM_ID"
 
     if [ "$TYPE" = "playlist" ]; then
+      echo "Getting details for playlist $ITEM_ID"
       PLAYLIST=$(source ./playlist "$ACCESS_TOKEN" "$ITEM_ID")
       ARTIST_NAME=$(jq -r '.artistName' <<< "$PLAYLIST")
       PLAYLIST_NAME=$(jq -r '.playlistName' <<< "$PLAYLIST")
@@ -74,6 +75,7 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
       cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
       cat <<< "${FILTERED_ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
     elif [ "$TYPE" = "artist" ]; then
+      echo "Getting details for artist $ITEM_ID"
       ADDITIONAL_ARTIST_DETAILS=$(source ./artist "$ACCESS_TOKEN" "$ITEM_ID")
       ARTIST_DETAILS=$(jq -n -c --argjson objA "$entry" --argjson objB "$ADDITIONAL_ARTIST_DETAILS" '$objA + $objB')
       ARTIST_NAME=$(echo "$ARTIST_DETAILS" | jq -r .name)
@@ -87,6 +89,7 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
       cat <<< "${ARTIST_DETAILS}" > "$OUTPUT_DIR/${ITEM_ID}/artist"
       cat <<< "${FILTERED_ALBUMS}" > "$OUTPUT_DIR/${ITEM_ID}/albums"
     elif [ "$TYPE" = "show" ]; then
+      echo "Getting details for show $ITEM_ID"
       SHOW=$(source ./show "$ACCESS_TOKEN" "$ITEM_ID")
       ARTIST_NAME=$(jq -r '.artistName' <<< "$SHOW")
       SHOW_NAME=$(jq -r '.showName' <<< "$SHOW")
@@ -103,9 +106,4 @@ jq -c '.[]' "$SOURCE_FILE" | while IFS= read -r entry; do
     else
       echo "Unknown type: $TYPE, skipping entry"
     fi
-
-    echo "Getting details for id $ITEM_ID"
-
-
-
 done
