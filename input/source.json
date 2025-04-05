@@ -20,15 +20,6 @@
   , "coverCenterY": 50
   , "coverColorA": "#DF030E"
   , "coverColorB": "#04A5E3" }
-, { "shortName": "D3"
-  , "httpFriendlyShortName": "d3"
-  , "type": "show"
-  , "id": "5cgMSSNAioVK0STCTlvo0z"
-  , "icon": "img/d3_transparent.png"
-  , "coverCenterX": 50
-  , "coverCenterY": 50
-  , "coverColorA": "#AAAAAA"
-  , "coverColorB": "#666666" }
 , { "shortName": "TKKG"
   , "httpFriendlyShortName": "tkkg"
   , "type": "artist"
@@ -66,7 +57,7 @@
 , { "shortName": "ShkOrg"
   , "httpFriendlyShortName": "shkorg"
   , "type": "playlist"
-  , "id": "5Vre4xsKCdhhxgrWsvDDuK"
+  , "id": "6V9TEjY6X24TI3jOBd5dCa"
   , "icon": "img/shk_org_transparent.png"
   , "coverCenterX": 50
   , "coverCenterY": 75
