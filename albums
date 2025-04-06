@@ -12,7 +12,6 @@ spotify_request() {
   local url=$2
 
   curl \
-#    --silent \
     --fail \
     --request GET \
     --url "$url" \
