@@ -25,6 +25,7 @@ call_results=()
 while [ -n "$api_url" ]
 do
   response=$(spotify_request "$access_token" "$api_url")
+  >&2 echo "$response"
   albums=$(echo "$response" | jq -r '[.items[] | {id, name, url_to_open: .external_urls.spotify, images: .images }]')
   call_results+=( "$albums" )
   
