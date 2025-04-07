@@ -12,6 +12,7 @@ spotify_request() {
   local url=$2
 
   curl \
+    --silent \
     --fail \
     --request GET \
     --url "$url" \
@@ -25,9 +26,6 @@ call_results=()
 while [ -n "$api_url" ]
 do
   response=$(spotify_request "$access_token" "$api_url")
-  >&2 echo "===================== ABLUMS ===================================="
-  >&2 echo "$response"
-  >&2 echo "================================================================="
   albums=$(echo "$response" | jq -r '[.items[] | {id, name, url_to_open: .external_urls.spotify, images: .images }]')
   call_results+=( "$albums" )
   
@@ -39,4 +37,7 @@ do
   if [ "$api_url" == "null" ]; then api_url=""; fi
 done
 
-echo -n "${call_results[*]}" | jq -r -s 'add'
+merged=$(echo -n "${call_results[*]}" | jq -r -s 'add')
+number_of_albums=$(echo "$merged" | jq 'length')
+echo -n "Total number of albums for this artist: ${number_of_albums}" >&2
+echo "$merged"
