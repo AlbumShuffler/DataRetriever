@@ -81,4 +81,22 @@
   , "coverCenterY": 50
   , "coverColorA": "#202e39"
   , "coverColorB": "#3c4e5c" }
+, { "shortName": "PvD"
+  , "httpFriendlyShortName": "pvd"
+  , "type": "artist"
+  , "id": "3Q6qDp4ybwv2KPJiWNw3xE"
+  , "icon": "img/pvd_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#A10000FF"
+  , "coverColorB": "#AAAAAA" }
+, { "shortName": "DDA"
+  , "httpFriendlyShortName": "dda"
+  , "type": "artist"
+  , "id": "2Jc4AEeBTE47KwuKgYOtcL"
+  , "icon": "img/dda_transparent.png"
+  , "coverCenterX": 50
+  , "coverCenterY": 50
+  , "coverColorA": "#8C4091FF"
+  , "coverColorB": "#86BC25FF" }
 ]
