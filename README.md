@@ -1,3 +1,5 @@
+**THIS REPOSITORY HAS BEEN DEPRECATED - USE THE [NEW VERSION](https://github.com/AlbumShuffler/DataRetrieverNet) INSTEAD**
+
 # Album Shuffler
 This repository contains basic shell scripts to automatically retrieve data from the Spotify API and save it as local JSON files.
 
